@@ -184,7 +184,7 @@ int insertLast(listNode* h, int key) {
 	/*노드 메모리할당 및 초기화*/
 	listNode *node = (listNode*)malloc(sizeof(listNode));
 	node->key = key;
-	/*node 링크 연결*/
+	/*node 연결*/
 	node->llink = h->llink;
 	node->rlink = h->llink->rlink;
 	h->llink->rlink = node;
@@ -220,17 +220,11 @@ int insertFirst(listNode* h, int key) {
 	/*노드 메모리할당 및 초기화*/
 	listNode *node=(listNode*)malloc(sizeof(listNode));
 	node->key=key;
-	/*node 링크 연결*/
+	/*node 연결*/
 	node->llink=h;
 	node->rlink=h->rlink;
-	if(h==h->rlink){
-		h->rlink=node;
-		h->llink=node;
-	}
-	else{
-		h->rlink=node;
-		node->rlink->llink = node;
-	}
+	h->rlink=node;
+	node->rlink->llink = node;
 	return 1;
 }
 
@@ -238,13 +232,17 @@ int insertFirst(listNode* h, int key) {
  * list의 첫번째 노드 삭제
  */
 int deleteFirst(listNode* h) {
+	/*첫번째 노드를 가리키는 포인터 first 선언 및 초기화*/
 	listNode *first=h->rlink;
+	/*리스트가 비어있을 경우 종료*/
 	if(h == h->rlink){
 		printf("list is empty!\n");
 		return 1;
 	}
+	/*첫번째 노드 다음 노드를 헤드노드와 연결*/
 	h->rlink=h->rlink->rlink;
 	h->rlink->llink=h;
+	/*첫번째 노드 메모리할당 해제*/
 	free(first);
 	return 1;
 }
@@ -254,7 +252,9 @@ int deleteFirst(listNode* h) {
  * 리스트의 링크를 역순으로 재 배치
  */
 int invertList(listNode* h) {
+	/*이전 노드, 현재 노드를 가리키는 포인터 선언 및 초기화*/
 	listNode *prev=NULL, *curr=h;
+	/*링크를 역으로 연결*/
 	do{
 		prev = curr;
 		curr = curr->rlink;
@@ -268,16 +268,18 @@ int invertList(listNode* h) {
 
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(listNode* h, int key) {
+	/*비어있는 리스트일 경우*/
 	if(h->rlink==h){
 		insertFirst(h,key);
 		return 0;
 	}
 
+	/*노드 메모리할당 및 초기화, 노드 탐색을 위한 포인터 search 선언 및 초기화*/
 	listNode *node=(listNode*)malloc(sizeof(listNode));
 	listNode *search=h->rlink;
 	node->key=key;
 	node->llink=node->rlink=NULL;
-	
+	/*입력받은 key보다 큰값이 나오기 전까지 반복, 끝까지 탐색했을 때 큰값이 없으면 탈출*/
 	while(search->key<key){
 		if(search == h){
 			break;
@@ -285,6 +287,7 @@ int insertNode(listNode* h, int key) {
 		search=search->rlink;
 	}
 
+	/*찾은 위치에 노드 링크 연결*/
 	node->rlink=search;
 	node->llink=search->llink;
 	search->llink->rlink=node;
@@ -297,11 +300,14 @@ int insertNode(listNode* h, int key) {
  * list에서 key에 대한 노드 삭제
  */
 int deleteNode(listNode* h, int key) {
+	/*삭제할 노드를 탐색할 포인터 search 선언 및 초기화*/
 	listNode *search=h->rlink;
+	/*비어있는 리스트일 경우*/
 	if(h->rlink==h){
 		printf("list is empty!\n");
 		return 0;
 	}
+	/*입력받은 key가 나오기 전까지 반복, 끝까지 탐색했을 때 key값이 없으면 함수종료*/
 	while(search->key!=key){
 		search = search->rlink;
 		if(search==h){
@@ -309,6 +315,7 @@ int deleteNode(listNode* h, int key) {
 			return 0;
 		}
 	}
+	/*찾은 노드의 연결 끊고 메모리할당 해제*/
 	search->llink->rlink = search->rlink;
 	search->rlink->llink = search->llink;
 	free(search);
